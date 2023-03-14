@@ -215,6 +215,13 @@
                 Else
                     SelectBegin = (selectionbegin - 79 + dispX) / zoomX
                     SelectEnd = (selectionbegin - 79 + selectionend + dispX) / zoomX
+                    If SelectEnd < selectionbegin Then
+                        Dim tmp As Integer = SelectEnd
+                        SelectEnd = SelectBegin
+                        SelectBegin = tmp
+                    End If
+                    If SelectBegin < 0 Then SelectBegin = 0
+                    If SelectEnd > dataset.Length - 1 Then SelectEnd = dataset.Length - 1
                 End If
             End If
         End If
