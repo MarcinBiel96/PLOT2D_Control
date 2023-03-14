@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class UserControl1
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+Partial Class Chart
     Inherits System.Windows.Forms.UserControl
 
     'UserControl1 przesłania metodę dispose, aby wyczyścić listę składników.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,18 +20,20 @@ Partial Class UserControl1
     'UWAGA: następująca procedura jest wymagana przez Projektanta formularzy systemu Windows
     'Możesz to modyfikować, używając Projektanta formularzy systemu Windows. 
     'Nie należy modyfikować za pomocą edytora kodu.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.SuspendLayout()
         '
-        'UserControl1
+        'Chart
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.ActiveCaptionText
         Me.DoubleBuffered = True
-        Me.Name = "UserControl1"
-        Me.Size = New System.Drawing.Size(511, 511)
+        Me.ForeColor = System.Drawing.Color.Cyan
+        Me.MinimumSize = New System.Drawing.Size(100, 100)
+        Me.Name = "Chart"
+        Me.Size = New System.Drawing.Size(500, 500)
         Me.ResumeLayout(False)
 
     End Sub
