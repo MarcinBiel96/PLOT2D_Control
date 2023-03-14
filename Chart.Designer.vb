@@ -26,14 +26,16 @@ Partial Class Chart
         '
         'Chart
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.ActiveCaptionText
         Me.DoubleBuffered = True
+        Me.Font = New System.Drawing.Font("Arial", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(238, Byte))
         Me.ForeColor = System.Drawing.Color.Cyan
-        Me.MinimumSize = New System.Drawing.Size(100, 100)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
+        Me.MinimumSize = New System.Drawing.Size(150, 138)
         Me.Name = "Chart"
-        Me.Size = New System.Drawing.Size(500, 500)
+        Me.Size = New System.Drawing.Size(600, 500)
         Me.ResumeLayout(False)
 
     End Sub

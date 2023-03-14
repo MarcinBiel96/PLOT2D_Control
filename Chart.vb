@@ -15,12 +15,11 @@
     Private Gridcolor As Pen
     Private p_frame As Pen
     Private textcolor As Brush
-    Public selectionActive As Boolean
-    Private selectionBegin As Integer = 100
-    Private selectionend As Integer = 120
+    Private SelectionEnabled As Boolean
     Public Property Grid_color As Color
     Public Property Text_color As Color
     Public Property Frame_color As Color
+    Public Property Selection_color As Color
 
     Public Property Zoom_Vertical() As String
         Get
@@ -67,8 +66,10 @@
             Return Me.tickY
         End Get
         Set(ByVal value As String)
-            Me.tickY = value
-            RePaint(Nothing, Nothing)
+            If value > 0 Then
+                Me.tickY = value
+                RePaint(Nothing, Nothing)
+            End If
         End Set
     End Property
     Public Property Ticks_Vertical() As String
@@ -76,8 +77,18 @@
             Return Me.tickX
         End Get
         Set(ByVal value As String)
-            Me.tickX = value
-            RePaint(Nothing, Nothing)
+            If value > 0 Then
+                Me.tickX = value
+                RePaint(Nothing, Nothing)
+            End If
+        End Set
+    End Property
+    Public Property Selection_Enabled() As Boolean
+        Get
+            Return Me.SelectionEnabled
+        End Get
+        Set(ByVal value As Boolean)
+            Me.SelectionEnabled = value
         End Set
     End Property
 
@@ -95,6 +106,7 @@
         Grid_color = Color.DimGray
         Text_color = Color.White
         Frame_color = Color.White
+        Selection_color = Color.FromArgb(128, 0, 0, 255)
         Dim data(1000) As Double
         ReDim dataset(1000)
         For i = 0 To 1000
@@ -144,29 +156,16 @@
         sf.Alignment = StringAlignment.Center
         sf.LineAlignment = StringAlignment.Center
         For i = 2 To Ytags.Length - 1
-            e.Graphics.DrawString((Ytags(i) - plot.Height \ 2 + dispY) / zoomY, New Font("arial", 12), textcolor, New RectangleF(0, Ytags(i) + 3, 78, 20), sf)
+            e.Graphics.DrawString((Ytags(i) - plot.Height \ 2 + dispY) / zoomY, Font, textcolor, New RectangleF(0, Ytags(i) + 3, 78, 20), sf)
         Next
-        'If selectionActive Then
-        '    If selectionend < 0 Then
-        '        e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(128, 0, 0, 255)), selectionBegin + selectionend, 11, -selectionend, plot.Height)
-        '    Else
-        '        e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(128, 0, 0, 255)), selectionBegin, 11, selectionend, plot.Height)
-        '    End If
-        'End If
         If selectionActive Then
-            'If selectionend < 0 Then
-            e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(128, 0, 0, 255)), Math.Max(Math.Min(selectionBegin + selectionend, selectionBegin), 80), 11, Math.Max(-selectionend, selectionend), plot.Height)
-            'Else
-            'e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(128, 0, 0, 255)), selectionBegin, 11, selectionend, plot.Height)
-            'End If
+            e.Graphics.FillRectangle(New SolidBrush(Selection_color), Math.Max(Math.Min(selectionbegin + selectionend, selectionbegin), 80), 11, Math.Max(-selectionend, selectionend), plot.Height)
         End If
-
         e.Graphics.RotateTransform(-90)
         e.Graphics.TranslateTransform(-plot.Height - 90, 68)
         For i = 1 To Xtags.Length - 1
-            e.Graphics.DrawString((Xtags(i) + dispX) / zoomX, New Font("arial", 12), textcolor, New RectangleF(0, Xtags(i) + 3, 78, 20), sf)
+            e.Graphics.DrawString((Xtags(i) + dispX) / zoomX, Font, textcolor, New RectangleF(0, Xtags(i) + 3, 78, 20), sf)
         Next
-
     End Sub
     Private Sub RePaint(sender As Object, e As EventArgs) Handles Me.Resize, Me.ForeColorChanged, Me.BackColorChanged
         If initialised Then
@@ -175,34 +174,49 @@
         End If
     End Sub
 
-    Dim selectionInProgress As Boolean
+    Private selectionActive As Boolean
+    Private selectionbegin As Integer
+    Private selectionend As Integer
+    Public SelectBegin As Integer
+    Public SelectEnd As Integer
+    Private selectionInProgress As Boolean
     Private Sub Chart_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
-        If e.X > 80 And e.X < Width - 11 And e.Y > 10 And e.Y < Height - 79 Then
-            selectionBegin = e.X
+        If SelectionEnabled Then
+            If e.Button = MouseButtons.Left AndAlso e.X > 80 AndAlso e.X < Width - 11 AndAlso e.Y > 10 AndAlso e.Y < Height - 79 Then
+            selectionbegin = e.X
             selectionend = 0
             selectionInProgress = True
             selectionActive = True
-        Else selectionactive = False
+        Else selectionActive = False
         End If
-        Refresh()
-    End Sub
-
-    Private Sub Chart_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        If selectionInProgress Then
-            If e.X < 80 Then
-                selectionend = 80 - selectionBegin
-            ElseIf e.X > Width - 11 Then
-                selectionend = Width - 11 - selectionBegin
-            Else
-                selectionend = e.X - selectionBegin
-            End If
-
-
             Refresh()
         End If
     End Sub
+    Private Sub Chart_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+        If SelectionEnabled Then
+            If selectionInProgress Then
+                If e.X < 79 Then
+                    selectionend = 79 - selectionbegin
+                ElseIf e.X > Width - 11 Then
+                    selectionend = Width - 11 - selectionbegin
+                Else
+                    selectionend = e.X - selectionbegin
+                End If
+                Refresh()
+            End If
+        End If
+    End Sub
     Private Sub Chart_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
-        selectionInProgress = False
-        If selectionend = 0 Then selectionActive = False
+        If SelectionEnabled Then
+            If e.Button = MouseButtons.Left Then
+                selectionInProgress = False
+                If selectionend = 0 Then
+                    selectionActive = False
+                Else
+                    SelectBegin = (selectionbegin - 79 + dispX) / zoomX
+                    SelectEnd = (selectionbegin - 79 + selectionend + dispX) / zoomX
+                End If
+            End If
+        End If
     End Sub
 End Class
